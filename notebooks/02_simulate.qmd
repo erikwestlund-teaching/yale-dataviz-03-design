@@ -1,0 +1,10 @@
+---
+title: "Test the Design by Simulation"
+---
+
+Simulate data from your DAG with a known effect, fit models with different adjustment sets, and plot which ones recover the truth. See `docs/reference/simulate-from-dag.qmd`.
+
+```{r}
+library(tidyverse)
+library(dagitty)
+```

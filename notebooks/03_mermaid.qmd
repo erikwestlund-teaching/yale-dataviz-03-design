@@ -1,0 +1,10 @@
+---
+title: "Diagram the Study Flow"
+---
+
+Have your assistant draw your study's flow (recruitment, exclusions, analysis) as a Mermaid diagram. Check the numbers and steps against your protocol.
+
+```{mermaid}
+flowchart LR
+  A[Start] --> B[Next step]
+```

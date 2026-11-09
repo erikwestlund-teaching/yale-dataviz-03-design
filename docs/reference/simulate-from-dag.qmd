@@ -1,0 +1,98 @@
+---
+title: "Testing a Design by Simulating From a DAG"
+---
+
+```{r}
+#| include: false
+library(dagitty)
+library(dplyr)
+library(ggplot2)
+```
+
+# Goal
+
+Use a DAG to decide what to adjust for, then **check that decision by simulation**: generate data where we know the true effect, fit models with different adjustment sets, and plot which ones recover the truth.
+
+# The design
+
+Question: what is the effect of exercise on blood pressure?
+
+- **Age** affects both exercise and blood pressure (a confounder).
+- **Clinic visit** is caused by both exercise and blood pressure (a collider).
+
+```{r}
+dag <- dagitty("dag {
+  Age -> Exercise
+  Age -> BloodPressure
+  Exercise -> BloodPressure
+  Exercise -> ClinicVisit
+  BloodPressure -> ClinicVisit
+}")
+
+coordinates(dag) <- list(
+  x = c(Age = 0, Exercise = 1, BloodPressure = 3, ClinicVisit = 2),
+  y = c(Age = 0, Exercise = 1, BloodPressure = 1, ClinicVisit = 2)
+)
+
+plot(dag)
+
+adjustmentSets(dag, exposure = "Exercise", outcome = "BloodPressure")
+```
+
+dagitty says to adjust for `Age` and nothing else.
+
+# Simulate data with a known effect
+
+The true effect of one unit of exercise on blood pressure is **−2**.
+
+```{r}
+set.seed(2026)
+true_effect <- -2
+
+simulate_once <- function(n = 500) {
+  age <- rnorm(n, 50, 10)
+  exercise <- 10 - 0.1 * age + rnorm(n)
+  blood_pressure <- 100 + 0.8 * age + true_effect * exercise + rnorm(n, sd = 5)
+  clinic_visit <- exercise + 0.3 * blood_pressure + rnorm(n)
+  tibble(age, exercise, blood_pressure, clinic_visit)
+}
+
+estimate <- function(data) {
+  tibble(
+    model = c("No adjustment", "Age (the DAG's set)", "Age + clinic visit (collider)"),
+    estimate = c(
+      coef(lm(blood_pressure ~ exercise, data))[["exercise"]],
+      coef(lm(blood_pressure ~ exercise + age, data))[["exercise"]],
+      coef(lm(blood_pressure ~ exercise + age + clinic_visit, data))[["exercise"]]
+    )
+  )
+}
+
+results <- bind_rows(lapply(1:500, function(i) estimate(simulate_once())))
+```
+
+# Plot which design recovers the truth
+
+```{r}
+#| fig-width: 8
+#| fig-height: 4
+results |>
+  mutate(model = factor(model, levels = rev(unique(model)))) |>
+  ggplot(aes(x = estimate, y = model)) +
+  geom_violin(fill = "grey85", color = NA) +
+  geom_vline(xintercept = true_effect, linetype = "dashed") +
+  annotate("text", x = true_effect, y = 3.45, label = "True effect", hjust = -0.1, size = 3.5) +
+  labs(
+    title = "Only the DAG's adjustment set recovers the true effect",
+    subtitle = "Estimated effect of exercise on blood pressure across 500 simulated datasets",
+    x = "Estimated effect (mm Hg per unit of exercise)",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 13)
+```
+
+# Takeaways
+
+- Leaving out the confounder (age) biases the estimate.
+- Adjusting for a collider (clinic visit) biases it again, even with age included.
+- A DAG states your assumptions; a simulation plus one plot shows what they imply. Change an arrow, re-run, and see whether your conclusion survives.

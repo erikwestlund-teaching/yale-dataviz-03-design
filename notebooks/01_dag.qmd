@@ -1,0 +1,9 @@
+---
+title: "Draw the Design as a DAG"
+---
+
+Describe your study design in plain words, have your assistant write it as a `dagitty` DAG, then check every arrow yourself. Ask dagitty for the adjustment set.
+
+```{r}
+library(dagitty)
+```
