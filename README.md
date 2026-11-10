@@ -2,13 +2,23 @@
 
 Part of the workshop **Data Visualization With AI**. Prompts are on the workshop page.
 
+## Install packages
+
+Run this once in the R console, from the project folder:
+
+```r
+source("setup.R")
+```
+
+It installs any of this project's packages that are missing: tidyverse, rmarkdown, here, dagitty.
+
 ## Open the project
 
 - **RStudio:** open the `.Rproj` file.
 - **Positron or VS Code:** open this folder.
 - **Claude Code or Codex:** start the tool from a terminal in this folder.
 
-You need R with **tidyverse**, **here**, and **rmarkdown**, plus **dagitty**, and Quarto (bundled with RStudio).
+You need R and Quarto (bundled with RStudio and Positron). `setup.R` installs the packages.
 
 ## What's here
 
