@@ -10,7 +10,7 @@ Run this once in the R console, from the project folder:
 source("setup.R")
 ```
 
-It installs any of this project's packages that are missing: tidyverse, rmarkdown, here, dagitty.
+It installs any of this project's packages that are missing: dplyr, ggplot2, dagitty, here, rmarkdown.
 
 ## Open the project
 
