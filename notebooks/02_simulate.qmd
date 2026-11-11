@@ -2,7 +2,7 @@
 title: "Test the Design by Simulation"
 ---
 
-Simulate data from your DAG with a known effect, fit models with different adjustment sets, and plot which ones recover the truth. See `docs/reference/simulate-from-dag.qmd`.
+Simulate data from your DAG with a known effect, fit models with different adjustment sets, and plot which ones recover the truth. Plot the DAG you simulate from, including any variable you add. See `docs/reference/simulate-from-dag.qmd`, which uses a smaller DAG than yours. Use it as a pattern.
 
 ```{r}
 library(dplyr)
